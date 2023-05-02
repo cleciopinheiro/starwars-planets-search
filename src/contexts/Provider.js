@@ -13,7 +13,6 @@ export default function Provider({ children }) {
       const data = await response.json();
       const newData = data.results;
       setApi(newData);
-      console.log(newData);
     };
     fetchAPI();
     setIsLoading(false);
@@ -32,5 +31,5 @@ export default function Provider({ children }) {
 }
 
 Provider.propTypes = {
-  children: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
 };
