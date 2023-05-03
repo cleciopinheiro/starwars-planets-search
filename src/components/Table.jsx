@@ -4,14 +4,14 @@ import '../styles/Table.css';
 
 export default function Table() {
   const { api, isLoading } = useContext(context);
-  const [data, setData] = useState([]);
   const [nameFilter, setFilterName] = useState('');
   const [columnFilter, setColumnFilter] = useState('population');
   const [compareFilter, setCompareFilter] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    setData([...api]);
+    setData(api);
   }, [api]);
 
   const handleChange = ({ target }) => {
@@ -32,13 +32,13 @@ export default function Table() {
   const handleFilter = () => {
     switch (compareFilter) {
     case 'maior que':
-      return setData(api
+      return setData(data
         .filter((item) => Number(item[columnFilter]) > Number(valueFilter)));
     case 'menor que':
-      return setData(api
+      return setData(data
         .filter((item) => Number(item[columnFilter]) < Number(valueFilter)));
     case 'igual a':
-      return setData(api
+      return setData(data
         .filter((item) => Number(item[columnFilter]) === Number(valueFilter)));
     default:
     }

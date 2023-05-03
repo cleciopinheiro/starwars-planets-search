@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import MyContext from './MyContext';
 
@@ -18,13 +18,13 @@ export default function Provider({ children }) {
     setIsLoading(false);
   }, []);
 
-  const STATE = {
+  const values = useMemo(() => ({
     api,
     isLoading,
-  };
+  }), [api, isLoading]);
 
   return (
-    <MyContext.Provider value={ STATE }>
+    <MyContext.Provider value={ values }>
       { children }
     </MyContext.Provider>
   );
