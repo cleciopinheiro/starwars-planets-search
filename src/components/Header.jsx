@@ -6,7 +6,7 @@ export default function Header() {
 
   return (
     <main>
-      <h1>STARWARS</h1>
+      <h1>STARWARS!</h1>
       <input
         name="filterName"
         type="text"
