@@ -9,10 +9,17 @@ export default function Table() {
   const [compareFilter, setCompareFilter] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
   const [data, setData] = useState([]);
+  const [options, setOptions] = useState(['population', 'orbital_period', 'diameter',
+    'rotation_period', 'surface_water']);
+  const [filters, setFilters] = useState([]);
 
   useEffect(() => {
     setData(api);
   }, [api]);
+
+  useEffect(() => {
+    setColumnFilter(options[0]);
+  }, [options]);
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
@@ -29,17 +36,35 @@ export default function Table() {
     }
   };
 
+  // const handleDeleteOption = useCallback(() => {
+  //   setFilters([...filters,
+  //     { columnFilter, compareFilter, valueFilter }]);
+  // });
+
   const handleFilter = () => {
+    setOptions(options.filter((option) => option !== columnFilter));
     switch (compareFilter) {
     case 'maior que':
-      return setData(data
-        .filter((item) => Number(item[columnFilter]) > Number(valueFilter)));
+      return (
+        setData(data
+          .filter((item) => Number(item[columnFilter]) > Number(valueFilter))),
+        setFilters([...filters,
+          { columnFilter, compareFilter, valueFilter }])
+      );
     case 'menor que':
-      return setData(data
-        .filter((item) => Number(item[columnFilter]) < Number(valueFilter)));
+      return (
+        setData(data
+          .filter((item) => Number(item[columnFilter]) < Number(valueFilter))),
+        setFilters([...filters,
+          { columnFilter, compareFilter, valueFilter }])
+      );
     case 'igual a':
-      return setData(data
-        .filter((item) => Number(item[columnFilter]) === Number(valueFilter)));
+      return (
+        setData(data
+          .filter((item) => Number(item[columnFilter]) === Number(valueFilter))),
+        setFilters([...filters,
+          { columnFilter, compareFilter, valueFilter }])
+      );
     default:
     }
   };
@@ -60,11 +85,11 @@ export default function Table() {
           value={ columnFilter }
           onChange={ handleChange }
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          {
+            options.map((option) => (
+              <option key={ option } value={ option }>{ option }</option>
+            ))
+          }
         </select>
 
         <select
@@ -95,6 +120,17 @@ export default function Table() {
           Filtrar
         </button>
       </form>
+      {filters.length > 0 && filters.map((filter) => (
+        <span key={ filter.columnFilter }>
+          {`${filter.columnFilter} ${filter.compareFilter} ${filter.valueFilter}`}
+          <button
+            // onClick={ handleDeleteOption }
+            type="button"
+          >
+            Excluir
+          </button>
+        </span>
+      ))}
 
       { isLoading && <p>Carregando...</p> }
       <table>
