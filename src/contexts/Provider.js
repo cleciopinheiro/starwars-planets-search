@@ -15,15 +15,15 @@ export default function Provider({ children }) {
   const [filters, setFilters] = useState([]);
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchAPI = async () => {
-      setIsLoading(true);
       const response = await fetch('https://swapi.dev/api/planets');
       const dataApi = await response.json();
       const newData = dataApi.results;
       setApi(newData);
+      setIsLoading(false);
     };
     fetchAPI();
-    setIsLoading(false);
   }, []);
 
   const values = useMemo(() => ({

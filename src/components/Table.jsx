@@ -3,7 +3,7 @@ import context from '../contexts/MyContext';
 import '../styles/Table.css';
 
 export default function Table() {
-  const { api, isLoading, data, options, setData, setColumnFilter,
+  const { api, data, options, setData, setColumnFilter,
     nameFilter } = useContext(context);
 
   useEffect(() => {
@@ -16,7 +16,6 @@ export default function Table() {
 
   return (
     <main>
-      { isLoading && <p>Carregando...</p> }
       <table>
         <thead>
           <tr>

@@ -49,7 +49,7 @@ export default function Filters() {
           < Number(filter.valueFilter));
       }
 
-      if (filter.compareFilter === '') {
+      if (filter.compareFilter === 'igual a') {
         newData = newData
           .filter((item) => Number(item[filter.columnFilter])
           === Number(filter.valueFilter));
@@ -101,7 +101,6 @@ export default function Filters() {
           ))
         }
       </select>
-
       <select
         name="compareFilter"
         data-testid="comparison-filter"
@@ -143,7 +142,7 @@ export default function Filters() {
         }
       </select>
 
-      <div name="radio" value="">
+      {/* <div name="radio" value="">
         <label htmlFor="ascendent">
           Ascendant
           <input
@@ -164,7 +163,7 @@ export default function Filters() {
             id="descendent"
           />
         </label>
-      </div>
+      </div> */}
 
       <button
         type="button"
@@ -178,6 +177,7 @@ export default function Filters() {
         <span data-testid="filter" key={ filter.columnFilter }>
           {`${filter.columnFilter} ${filter.compareFilter} ${filter.valueFilter}`}
           <button
+            data-testid="rmv-filter"
             onClick={ () => handleDeleteOption(filter.columnFilter) }
             type="button"
           >
