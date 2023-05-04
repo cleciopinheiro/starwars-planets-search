@@ -20,8 +20,8 @@ export default function Provider({ children }) {
       const response = await fetch('https://swapi.dev/api/planets');
       const dataApi = await response.json();
       const newData = dataApi.results;
-      setApi(newData);
       setIsLoading(false);
+      setApi(newData);
     };
     fetchAPI();
   }, []);

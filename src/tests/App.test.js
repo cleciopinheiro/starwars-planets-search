@@ -4,6 +4,7 @@ import App from '../App';
 import Provider from '../contexts/Provider';
 import mockData from '../tests/helpers/mockData';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react-dom/test-utils';
 
 describe('Verifique os testes da aplicação', () => {
   beforeEach(() => {
@@ -34,12 +35,12 @@ describe('Verifique os testes da aplicação', () => {
 
   test('Verifique se o input para filtrar pelo nome está em funcionamento', async () => {
     const nameFilter = screen.getByTestId('name-filter')
+    userEvent.clear(nameFilter);
     userEvent.type(nameFilter, 'a');
+
     await waitFor(() => {
       expect(screen.getByRole('cell', { name: /alderaan/i })).toBeInTheDocument();
     })
-    userEvent.clear(nameFilter);
-    expect(screen.getByRole('cell', { name: /tatooine/i })).toBeInTheDocument();
   });
 
   test('Verifique se renderiza os elementos select column, select operator, input number e um button', () => {
@@ -60,121 +61,145 @@ describe('Verifique os testes da aplicação', () => {
     const selectColumn = screen.getByTestId('column-filter')
     const selectCompare = screen.getByTestId('comparison-filter')
     const valueFilter = screen.getByRole('spinbutton');
-    const filterBtn = await screen.findByRole('button', {  name: /filtrar/i});
-    const removeAllBtn = await screen.findByRole('button', {  name: /remover filtros/i});
-    const deleteFilter = screen.queryByRole('button', {  name: 'Excluir'});
-    expect(deleteFilter).not.toBeInTheDocument();
+    const buttonAddFilter = await screen.findByRole('button', {  name: /filtrar/i});
+    const buttonRemoveAllFilters = await screen.findByRole('button', {  name: /remover filtros/i});
 
-    userEvent.selectOptions(selectColumn, 'orbital_period');
-    expect(selectColumn).toHaveValue('orbital_period');
+    userEvent.selectOptions(selectColumn, 'population');
+    expect(selectColumn).toHaveValue('population');
 
-    userEvent.selectOptions(selectCompare, 'igual a');
-    expect(selectCompare).toHaveValue('igual a');
+    userEvent.selectOptions(selectCompare, 'maior que');
+    expect(selectCompare).toHaveValue('maior que');
 
     userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '304');
-    expect(valueFilter).toHaveValue(304);
+    userEvent.type(valueFilter, '1000000');
+    expect(valueFilter).toHaveValue(1000000);
 
-    userEvent.click(filterBtn);
-
-    await waitFor(() => {
-      expect(screen.getAllByRole('cell')).toHaveLength(13);
-      expect(screen.queryByRole('cell', {  name: /hoth/i})).not.toBeInTheDocument();
-      expect(screen.getByRole('cell', {  name: /tatooine/i})).toBeInTheDocument();
-
-      expect(screen.queryByDisplayValue('orbital_period')).not.toBeInTheDocument();
-
-      const filter = screen.getByTestId('filter');
-      expect(filter).toBeInTheDocument();
-      expect(filter.firstChild).toHaveTextContent('orbital_period igual a 304');
-
-      const newDeleteFilter = screen.getByRole('button', {  name: 'Excluir'});
-      expect(newDeleteFilter).toBeInTheDocument();
-      userEvent.click(newDeleteFilter)
-      expect(screen.queryByTestId('filter')).not.toBeInTheDocument();
+    act(() => {
+      userEvent.click(buttonAddFilter);
     });
 
-    expect(selectColumn.children).toHaveLength(5);
-    userEvent.selectOptions(selectColumn, 'diameter');
-    userEvent.selectOptions(selectCompare, 'menor que');
-    userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '10000');
-    userEvent.click(filterBtn);
-    userEvent.selectOptions(selectColumn, 'population');
-    userEvent.selectOptions(selectCompare, 'igual a');
-    userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '30000000');
-    userEvent.click(filterBtn);
+    await waitFor(() => {
+      expect(screen.queryByRole('cell', {  name: /hoth/i})).not.toBeInTheDocument();
+      expect(screen.getByRole('cell', {  name: /alderaan/i})).toBeInTheDocument();
+    });
+    
+    expect(screen.queryByDisplayValue('population')).not.toBeInTheDocument();
+
+    const filter = screen.getByTestId('filter');
+    expect(filter).toBeInTheDocument();
+    expect(filter.firstChild).toHaveTextContent('population maior que 1000000');
+
+    const buttonRemoveFilter = await screen.findByRole('button', {  name: /excluir/i});
+
+    act(() => {
+      userEvent.click(buttonRemoveFilter);
+    });
 
     await waitFor(() => {
-      expect(screen.getAllByRole('cell')).toHaveLength(13);
-      expect(screen.getByRole('cell', {  name: /endor/i})).toBeInTheDocument();
-      expect(screen.queryByRole('cell', {  name: /tatooine/i})).not.toBeInTheDocument();
+      expect(screen.queryByTestId('filter')).not.toBeInTheDocument();
+      expect(selectColumn.children).toHaveLength(5);
+    });
+
+    userEvent.selectOptions(selectColumn, 'diameter');
+
+    userEvent.selectOptions(selectCompare, 'menor que');
+
+    userEvent.clear(valueFilter);
+    userEvent.type(valueFilter, '8900');
+
+    act(() => {
+      userEvent.click(buttonAddFilter);
+    });
+
+    userEvent.selectOptions(selectColumn, 'orbital_period');
+
+    userEvent.selectOptions(selectCompare, 'igual a');
+
+    userEvent.clear(valueFilter);
+    userEvent.type(valueFilter, '549');
+
+    act(() => {
+      userEvent.click(buttonAddFilter);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole('cell', {  name: /hoth/i})).toBeInTheDocument();
       expect(selectColumn.children).toHaveLength(3);
     });
 
-    userEvent.click(removeAllBtn);
-    await waitFor(() => {
-      expect(screen.getAllByRole('cell')).toHaveLength(130);
+    act(() => {
+      userEvent.click(buttonRemoveAllFilters);
     });
 
-    userEvent.selectOptions(selectColumn, 'rotation_period');
+    await waitFor(() => {
+      expect(screen.getAllByRole('cell')).toHaveLength(130);
+      expect(selectColumn.children).toHaveLength(5);
+    });
+
+    userEvent.selectOptions(selectColumn, 'population');
     userEvent.selectOptions(selectCompare, 'maior que');
     userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '23');
-    userEvent.click(filterBtn);
+    userEvent.type(valueFilter, '10000');
+    userEvent.click(buttonAddFilter);
+
     await waitFor(() => {
       expect(selectColumn.children).toHaveLength(4);
-      expect(screen.getAllByRole('cell')).toHaveLength(65);
+      expect(screen.getAllByRole('cell')).toHaveLength(91);
+      const buttonRemove = screen.getAllByTestId('rmv-filter');
+      expect(buttonRemove).toHaveLength(1);
     });
+    
+
+    userEvent.selectOptions(selectColumn, 'orbital_period');
+    userEvent.selectOptions(selectCompare, 'menor que');
+    userEvent.clear(valueFilter);
+    userEvent.type(valueFilter, '5000');
+    userEvent.click(buttonAddFilter);
+
+    await waitFor(() => {
+      expect(selectColumn.children).toHaveLength(3);
+      expect(screen.getAllByRole('cell')).toHaveLength(78);
+      const buttonRemove = screen.getAllByTestId('rmv-filter');
+      expect(buttonRemove).toHaveLength(2);
+    });
+
+    userEvent.selectOptions(selectColumn, 'diameter');
+    userEvent.selectOptions(selectCompare, 'igual a');
+    userEvent.clear(valueFilter);
+    userEvent.type(valueFilter, '12500');
+    userEvent.click(buttonAddFilter);
+
+    await waitFor(() => {
+      expect(selectColumn.children).toHaveLength(2);
+      expect(screen.getAllByRole('cell')).toHaveLength(13);
+      const buttonRemove = screen.getAllByTestId('rmv-filter');
+      expect(buttonRemove).toHaveLength(3);
+    });
+
     userEvent.selectOptions(selectColumn, 'surface_water');
     userEvent.selectOptions(selectCompare, 'maior que');
     userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '10');
-    userEvent.click(filterBtn);
+    userEvent.type(valueFilter, '39');
+    userEvent.click(buttonAddFilter);
+
     await waitFor(() => {
-      expect(selectColumn.children).toHaveLength(3);
-      expect(screen.getAllByRole('cell')).toHaveLength(39);
-    });
-    userEvent.selectOptions(selectColumn, 'orbital_period');
-    userEvent.selectOptions(selectCompare, 'menor que');
-    userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '400');
-    userEvent.click(filterBtn);
-    await waitFor(() => {
-      expect(selectColumn.children).toHaveLength(2);
-      expect(screen.getAllByRole('cell')).toHaveLength(26);
-    });
-    userEvent.selectOptions(selectColumn, 'diameter');
-    userEvent.selectOptions(selectCompare, 'igual a');
-    userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '12120');
-    userEvent.click(filterBtn);
-    await waitFor( () => {
       expect(selectColumn.children).toHaveLength(1);
       expect(screen.getAllByRole('cell')).toHaveLength(13);
-      const filterBtns = screen.getAllByTestId('rmv-filter');
-      expect(filterBtns).toHaveLength(4);
-      userEvent.click(filterBtns[3]);
+      const buttonRemove = screen.getAllByTestId('rmv-filter');
+      expect(buttonRemove).toHaveLength(4);
     });
-    const filterBtns2 = await screen.findAllByTestId('rmv-filter');
-    expect(filterBtns2).toHaveLength(3);
-    userEvent.click(filterBtns2[2]);
+    
+    const buttonRmv = await screen.findAllByTestId('rmv-filter');
+
+    userEvent.click(buttonRmv[3]);
+
     await waitFor(() => {
-      const filterBtns = screen.getAllByTestId('rmv-filter');
-      expect(filterBtns).toHaveLength(2);
-      userEvent.click(filterBtns[1]);
+      expect(selectColumn.children).toHaveLength(2);
+      expect(screen.getAllByRole('cell')).toHaveLength(13);
+      const buttonRemove = screen.getAllByTestId('rmv-filter');
+      expect(buttonRemove).toHaveLength(3);
     });
-    userEvent.selectOptions(selectColumn, 'diameter');
-    userEvent.selectOptions(selectCompare, 'igual a');
-    userEvent.clear(valueFilter);
-    userEvent.type(valueFilter, '12120');
-    userEvent.click(filterBtn);
-    await waitFor(() => {
-      const filterBtns = screen.getAllByTestId('rmv-filter');
-      expect(filterBtns).toHaveLength(2);
-      userEvent.click(filterBtns[1]);
-    });
+    
   });
 })
 

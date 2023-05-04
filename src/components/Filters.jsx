@@ -1,25 +1,10 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
 import context from '../contexts/MyContext';
 
 export default function Filters() {
   const { columnFilter, compareFilter, valueFilter, setColumnFilter, setValueFilter,
     options, filters, api, data, setData, setCompareFilter,
-    setOptions, setFilters, setFilterName } = useContext(context);
-
-  const handleChange = ({ target }) => {
-    const { name, value } = target;
-    switch (name) {
-    case 'filterName':
-      return setFilterName(value);
-    case 'columnFilter':
-      return setColumnFilter(value);
-    case 'compareFilter':
-      return setCompareFilter(value);
-    case 'valueFilter':
-      return setValueFilter(value);
-    default:
-    }
-  };
+    setOptions, setFilters } = useContext(context);
 
   const handleDeleteFilters = () => {
     setFilters([]);
@@ -28,7 +13,7 @@ export default function Filters() {
       'rotation_period', 'surface_water']);
   };
 
-  const handleDeleteOption = useCallback((column) => {
+  const handleDeleteOption = (column) => {
     const filtered = filters.map((map) => map)
       .filter((filter) => filter.columnFilter !== column);
     setFilters([...filtered]);
@@ -57,33 +42,57 @@ export default function Filters() {
     });
 
     setData([...newData]);
-  }, [options, filters, api, setData, setFilters]);
+  };
+
+  // const handleFilter = () => {
+  //   setOptions(options.filter((option) => option !== columnFilter));
+  //   switch (compareFilter) {
+  //   case 'maior que':
+  //     return (
+  //       setData(data
+  //         .filter((item) => Number(item[columnFilter]) > Number(valueFilter))),
+  //       setFilters([...filters,
+  //         { columnFilter, compareFilter, valueFilter }])
+  //     );
+  //   case 'menor que':
+  //     return (
+  //       setData(data
+  //         .filter((item) => Number(item[columnFilter]) < Number(valueFilter))),
+  //       setFilters([...filters,
+  //         { columnFilter, compareFilter, valueFilter }])
+  //     );
+  //   case 'igual a':
+  //     return (
+  //       setData(data
+  //         .filter((item) => Number(item[columnFilter]) === Number(valueFilter))),
+  //       setFilters([...filters,
+  //         { columnFilter, compareFilter, valueFilter }])
+  //     );
+  //   default:
+  //   }
+  // };
 
   const handleFilter = () => {
     setOptions(options.filter((option) => option !== columnFilter));
-    switch (compareFilter) {
-    case 'maior que':
-      return (
-        setData(data
-          .filter((item) => Number(item[columnFilter]) > Number(valueFilter))),
-        setFilters([...filters,
-          { columnFilter, compareFilter, valueFilter }])
-      );
-    case 'menor que':
-      return (
-        setData(data
-          .filter((item) => Number(item[columnFilter]) < Number(valueFilter))),
-        setFilters([...filters,
-          { columnFilter, compareFilter, valueFilter }])
-      );
-    case 'igual a':
-      return (
-        setData(data
-          .filter((item) => Number(item[columnFilter]) === Number(valueFilter))),
-        setFilters([...filters,
-          { columnFilter, compareFilter, valueFilter }])
-      );
-    default:
+    if (compareFilter === 'maior que') {
+      setData(data
+        .filter((item) => Number(item[columnFilter]) > Number(valueFilter)));
+      setFilters([...filters,
+        { columnFilter, compareFilter, valueFilter }]);
+    }
+
+    if (compareFilter === 'menor que') {
+      setData(data
+        .filter((item) => Number(item[columnFilter]) < Number(valueFilter)));
+      setFilters([...filters,
+        { columnFilter, compareFilter, valueFilter }]);
+    }
+
+    if (compareFilter === 'igual a') {
+      setData(data
+        .filter((item) => Number(item[columnFilter]) === Number(valueFilter)));
+      setFilters([...filters,
+        { columnFilter, compareFilter, valueFilter }]);
     }
   };
 
@@ -93,7 +102,7 @@ export default function Filters() {
         name="columnFilter"
         data-testid="column-filter"
         value={ columnFilter }
-        onChange={ handleChange }
+        onChange={ ({ target }) => setColumnFilter(target.value) }
       >
         {
           options.map((option) => (
@@ -105,7 +114,7 @@ export default function Filters() {
         name="compareFilter"
         data-testid="comparison-filter"
         value={ compareFilter }
-        onChange={ handleChange }
+        onChange={ ({ target }) => setCompareFilter(target.value) }
       >
         <option value="maior que">maior que</option>
         <option value="menor que">menor que</option>
@@ -115,7 +124,7 @@ export default function Filters() {
       <input
         type="number"
         data-testid="value-filter"
-        onChange={ handleChange }
+        onChange={ ({ target }) => setValueFilter(target.value) }
         value={ valueFilter }
         name="valueFilter"
         placeholder="0"
@@ -129,18 +138,18 @@ export default function Filters() {
         Filtrar
       </button>
 
-      <select
+      {/* <select
         name="columnFilter"
         data-testid="column-sort"
         value={ columnFilter }
-        onChange={ handleChange }
+        onChange={ ({ target }) => setCompareFilter(target.value) }
       >
         {
           options.map((option) => (
             <option key={ option } value={ option }>{ option }</option>
           ))
         }
-      </select>
+      </select> */}
 
       {/* <div name="radio" value="">
         <label htmlFor="ascendent">
