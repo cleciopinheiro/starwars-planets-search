@@ -21,16 +21,12 @@ Faça o clone deste repositório com o comando abaixo.
 
       git clone git@github.com:cleciopinheiro/starwars-planets-search.git
 
-Instale as dependências do projeto.
+Entre no diretório da aplicação.
 
-      npm install
+      cd starwars-planets-search
 
-Para executar os testes rode o seguinte comando.
+Para rodar local.
 
-      npm test
-      
-Para executar testes individualmente, faça uma adaptação do comando a seguir.
-
-      npm test <nome-do-arquivo>
+      npm run dev
 
 Desenvolvido por [Clécio Pinheiro](https://www.linkedin.com/in/cleciopinheirodev/) © 2023.
