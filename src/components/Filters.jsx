@@ -1,199 +1,50 @@
-import React, { useContext } from 'react';
-import context from '../contexts/MyContext';
+import { useContext } from 'react';
+import Button from './Button';
+import RadioInput from './RadioInput';
+import SearchInput from './SearchInput';
+import SelectInput from './SelectInput';
+import { GoSearch } from "react-icons/go";
+import { VscError } from "react-icons/vsc";
+import Context from '../context/Context';
 
-export default function Filters() {
-  const { columnFilter, compareFilter, valueFilter, setColumnFilter, setValueFilter,
-    options, filters, api, data, setData, setCompareFilter,
-    setOptions, setFilters } = useContext(context);
+function Filters() {
+  const { options, inputsValue, setInputsValue } = useContext(Context);
 
-  const handleDeleteFilters = () => {
-    setFilters([]);
-    setData([...api]);
-    setOptions(['population', 'orbital_period', 'diameter',
-      'rotation_period', 'surface_water']);
+  const handleSearch = () => {
+    console.log('Buscar');
   };
 
-  const handleDeleteOption = (column) => {
-    const filtered = filters.map((map) => map)
-      .filter((filter) => filter.columnFilter !== column);
-    setFilters([...filtered]);
-    options.push(column);
-
-    let newData = [...api];
-
-    filtered.forEach((filter) => {
-      if (filter.compareFilter === 'maior que') {
-        newData = newData
-          .filter((item) => Number(item[filter.columnFilter])
-          > Number(filter.valueFilter));
-      }
-
-      if (filter.compareFilter === 'menor que') {
-        newData = newData
-          .filter((item) => Number(item[filter.columnFilter])
-          < Number(filter.valueFilter));
-      }
-
-      if (filter.compareFilter === 'igual a') {
-        newData = newData
-          .filter((item) => Number(item[filter.columnFilter])
-          === Number(filter.valueFilter));
-      }
-    });
-
-    setData([...newData]);
+  const handleChange = ({ target }) => {
+    const { name, value } = target;
+    setInputsValue((prevState) => ({ ...prevState, [name]: value }));
   };
-
-  // const handleFilter = () => {
-  //   setOptions(options.filter((option) => option !== columnFilter));
-  //   switch (compareFilter) {
-  //   case 'maior que':
-  //     return (
-  //       setData(data
-  //         .filter((item) => Number(item[columnFilter]) > Number(valueFilter))),
-  //       setFilters([...filters,
-  //         { columnFilter, compareFilter, valueFilter }])
-  //     );
-  //   case 'menor que':
-  //     return (
-  //       setData(data
-  //         .filter((item) => Number(item[columnFilter]) < Number(valueFilter))),
-  //       setFilters([...filters,
-  //         { columnFilter, compareFilter, valueFilter }])
-  //     );
-  //   case 'igual a':
-  //     return (
-  //       setData(data
-  //         .filter((item) => Number(item[columnFilter]) === Number(valueFilter))),
-  //       setFilters([...filters,
-  //         { columnFilter, compareFilter, valueFilter }])
-  //     );
-  //   default:
-  //   }
-  // };
 
   const handleFilter = () => {
-    setOptions(options.filter((option) => option !== columnFilter));
-    if (compareFilter === 'maior que') {
-      setData(data
-        .filter((item) => Number(item[columnFilter]) > Number(valueFilter)));
-      setFilters([...filters,
-        { columnFilter, compareFilter, valueFilter }]);
-    }
+    console.log('Filtrar');
+  };
 
-    if (compareFilter === 'menor que') {
-      setData(data
-        .filter((item) => Number(item[columnFilter]) < Number(valueFilter)));
-      setFilters([...filters,
-        { columnFilter, compareFilter, valueFilter }]);
-    }
-
-    if (compareFilter === 'igual a') {
-      setData(data
-        .filter((item) => Number(item[columnFilter]) === Number(valueFilter)));
-      setFilters([...filters,
-        { columnFilter, compareFilter, valueFilter }]);
-    }
+  const handleOrder = () => {
+    console.log('Ordenar');
   };
 
   return (
-    <form>
-      <select
-        name="columnFilter"
-        data-testid="column-filter"
-        value={ columnFilter }
-        onChange={ ({ target }) => setColumnFilter(target.value) }
-      >
-        {
-          options.map((option) => (
-            <option key={ option } value={ option }>{ option }</option>
-          ))
-        }
-      </select>
-      <select
-        name="compareFilter"
-        data-testid="comparison-filter"
-        value={ compareFilter }
-        onChange={ ({ target }) => setCompareFilter(target.value) }
-      >
-        <option value="maior que">maior que</option>
-        <option value="menor que">menor que</option>
-        <option value="igual a">igual a</option>
-      </select>
-
-      <input
-        type="number"
-        data-testid="value-filter"
-        onChange={ ({ target }) => setValueFilter(target.value) }
-        value={ valueFilter }
-        name="valueFilter"
-        placeholder="0"
-      />
-
-      <button
-        type="button"
-        data-testid="button-filter"
-        onClick={ handleFilter }
-      >
-        Filtrar
-      </button>
-
-      {/* <select
-        name="columnFilter"
-        data-testid="column-sort"
-        value={ columnFilter }
-        onChange={ ({ target }) => setCompareFilter(target.value) }
-      >
-        {
-          options.map((option) => (
-            <option key={ option } value={ option }>{ option }</option>
-          ))
-        }
-      </select> */}
-
-      {/* <div name="radio" value="">
-        <label htmlFor="ascendent">
-          Ascendant
-          <input
-            data-testid="column-sort-input-asc"
-            type="radio"
-            name="radio"
-            value="ASC"
-            id="ascendent"
-          />
-        </label>
-        <label htmlFor="descendent">
-          Descendant
-          <input
-            data-testid="column-sort-input-asc"
-            type="radio"
-            name="radio"
-            value="DESC"
-            id="descendent"
-          />
-        </label>
-      </div> */}
-
-      <button
-        type="button"
-        data-testid="button-remove-filters"
-        onClick={ handleDeleteFilters }
-      >
-        Remover Filtros
-      </button>
-
-      {filters.length > 0 && filters.map((filter) => (
-        <span data-testid="filter" key={ filter.columnFilter }>
-          {`${filter.columnFilter} ${filter.compareFilter} ${filter.valueFilter}`}
-          <button
-            data-testid="rmv-filter"
-            onClick={ () => handleDeleteOption(filter.columnFilter) }
-            type="button"
-          >
-            Excluir
-          </button>
-        </span>
-      ))}
-    </form>
+    <div className='filter-container'>
+      <div className='search'>
+        <SearchInput value={ inputsValue.search } name='search' onChange={ (e) => handleChange(e) } />
+        <GoSearch onClick={ handleSearch } size={32} color='white' className='search-button' />
+      </div>
+      <div className='filters'>
+        <SelectInput options={ options } name='column' id='column' value={ inputsValue.column } onChange={ (e) => handleChange(e) } />
+        <SelectInput options={['Menor que', 'Maior que', 'Igual a']} value={ inputsValue.comparison } name='comparison' id='comparison' onChange={ (e) => handleChange(e) } />
+        <input type="number" name='value' value={ inputsValue.value } onChange={ (e) => handleChange(e) } />
+        <Button value='Filter' onClick={ handleFilter } />
+        <SelectInput options={ options } value={ inputsValue.order } name='order' id='order' onChange={ (e) => handleChange(e) } />
+        <RadioInput name='sort' id='sort' value='ASC' defaultChecked onChange={ (e) => handleChange(e) } />
+        <RadioInput name='sort' id='sort' value='DESC' onChange={ (e) => handleChange(e) } />
+        <Button value='Order' onClick={ handleOrder } />
+      </div>
+    </div>
   );
 }
+
+export default Filters;
